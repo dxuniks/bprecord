@@ -24,7 +24,7 @@ class CaptureType(Base):
     __tablename__ = "capture_type"
 
     Id = Column(Integer, primary_key=True)
-    Description= Column(String)
+    Description = Column(String)
 
 Base.metadata.bind = engine
 Base.metadata.create_all()
