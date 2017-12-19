@@ -17,6 +17,14 @@ class BPRecord(Base):
     Sys = Column(Integer)
     Dia = Column(Integer)
     Pulse = Column(Integer)
+    CaptureType = Column(Integer)
+    Note = Column(String)
 
-    Base.metadata.bind = engine
-    Base.metadata.create_all()
+class CaptureType(Base):
+    __tablename__ = "capture_type"
+
+    Id = Column(Integer, primary_key=True)
+    Description= Column(String)
+
+Base.metadata.bind = engine
+Base.metadata.create_all()
