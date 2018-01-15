@@ -1,30 +1,114 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from sqlalchemy import create_engine
+import getopt
+import logging
+import sys
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-engine = create_engine('sqlite:///./bprecords.db')
 
 Base = declarative_base()
+Session = sessionmaker()
 
-class BPRecord(Base):
-    __tablename__ = "bp_record"
 
-    Id = Column(Integer, primary_key=True)
-    EntryTime = Column(DateTime)
-    Sys = Column(Integer)
-    Dia = Column(Integer)
-    Pulse = Column(Integer)
-    CaptureType = Column(Integer)
-    Note = Column(String)
+class Record(Base):
+    __tablename__ = 'record'
+
+    id = Column(Integer, primary_key=True)
+    parent_id = Column(Integer, ForeignKey('record.id'))
+    entry_time = Column(DateTime)
+    sys = Column(Integer)
+    dia = Column(Integer)
+    pulse = Column(Integer)
+    capture_type_id = Column(Integer, ForeignKey('capture_type.id'))
+    capture_type = relationship('CaptureType')
+    note = Column(String)
+    sub_records = relationship('Record')
+
+    def __repr__(self):
+        return "{Record: {id: %d; capture_type_id: %d}}" % (self.id, self.parent_id)
+
 
 class CaptureType(Base):
-    __tablename__ = "capture_type"
+    __tablename__ = 'capture_type'
 
-    Id = Column(Integer, primary_key=True)
-    Description = Column(String)
+    id = Column(Integer, primary_key=True)
+    description = Column(String)
 
-Base.metadata.bind = engine
-Base.metadata.create_all()
+    def __repr__(self):
+        return "CaptureType: {id: %d; description: %s}" % (self.id, self.description)
+
+
+def init_db(engine):
+    print("create db schema...")
+    Base.metadata.create_all(engine)
+
+
+def persist_record(session, data):
+    session.add(data)
+    session.commit()
+
+
+def get_db_engine(dbname):
+    db_str = 'sqlite:///' + dbname
+    engine = create_engine(db_str, echo=True)
+    return engine
+
+
+def get_db_session(engine):
+    Session.configure(bind=engine)
+    session = Session()
+    return session
+
+
+def get_new_session(dbname):
+    db_str = 'sqlite:///' + dbname
+    engine = create_engine(db_str, echo=True)
+    Session.configure(bind=engine)
+    session = Session()
+    return session
+
+
+def main():
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "a:i:d:t:", ["action=", "input=", "db=", 'table='])
+    except getopt.GetoptError as err:
+        # print help information and exit:
+        logging.error(str(err))  # will print something like "option -a not recognized"
+        sys.exit(2)
+    input_filename = None
+    dbname = None
+    tablename = all
+    for option, value in opts:
+        if option in ("-a", "--action"):
+            action = value
+        elif option in ("-i", "--input"):
+            input_filename = value
+        elif option in ("-d", "--db"):
+            dbname = value
+        elif option in ("-t", "--table"):
+            tablename = value
+        else:
+            assert False, "unhandled option"
+
+    engine = get_db_engine(dbname)
+
+    if action == 'loaddata':
+        logging.info('NOT SUPORTED: load data in [%s] to db is [%s]' % (input_filename, dbname))
+
+    if action == 'getall':
+        logging.info('NOT SUPORTED: load data in [%s] to db is [%s]' % (input_filename, dbname))
+
+    if action == 'create':
+        logging.info('create db schema [%s]' % dbname)
+        init_db(engine)
+
+    logging.info('task done')
+
+
+if __name__ == "__main__":
+    main()
