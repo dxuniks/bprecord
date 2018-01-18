@@ -42,6 +42,12 @@ class CaptureType(Base):
     def __repr__(self):
         return "CaptureType: {id: %d; description: %s}" % (self.id, self.description)
 
+    def json_string(self):
+        if id is none:
+            return '{id: none, description: "%s"}' % self.description
+        else:
+            return '{id: %s, description: "%s"}' % (self.id, self.description)
+            
 
 def init_db(engine):
     print("create db schema...")
