@@ -39,11 +39,15 @@ class CaptureType(Base):
     id = Column(Integer, primary_key=True)
     description = Column(String)
 
+    def __init__(self, description="New Capture Type"):
+        self.description = description
+        print(self.description)
+
     def __repr__(self):
-        return "CaptureType: {id: %d; description: %s}" % (self.id, self.description)
+        return "CaptureType: {id: {}; description: {}}" % (self.id if self.id is not None else "_None_", self.description)
 
     def json_string(self):
-        if id is none:
+        if self.id is None:
             return '{id: none, description: "%s"}' % self.description
         else:
             return '{id: %s, description: "%s"}' % (self.id, self.description)
