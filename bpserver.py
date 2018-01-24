@@ -5,6 +5,7 @@ from bpdata import get_new_session, persist_record
 
 app = Flask(__name__)
 
+session = None
 
 def main():
     app.run()
@@ -29,7 +30,9 @@ def add_capture_type():
     capture_type = request.json
     capture_type_record = CaptureType(capture_type['description'])
     print(capture_type_record.json_string())
-    session = get_new_session('bprecords.db')
+    global session
+    if session is None:
+       session = get_new_session('bprecords.db')
     persist_record(session, capture_type_record)
     return "posted new capture type {}".format(capture_type_record.json_string())
 
