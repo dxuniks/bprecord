@@ -4,6 +4,7 @@
 import getopt
 import logging
 import sys
+import json
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
@@ -51,7 +52,9 @@ class CaptureType(Base):
             return '{id: none, description: "%s"}' % self.description
         else:
             return '{id: %s, description: "%s"}' % (self.id, self.description)
-            
+    
+    def to_json(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True)
 
 def init_db(engine):
     print("create db schema...")

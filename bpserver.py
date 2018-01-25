@@ -1,3 +1,4 @@
+import json
 from flask import Flask
 from flask import request, abort
 from bpdata import CaptureType
@@ -22,6 +23,15 @@ def add_bpr():
     print(payload)
     return "posted"
 
+@app.route("/capturetype", methods=['GET'])
+def get_capture_type():
+    global session
+    if session is None:
+        session = get_new_session('bprecords.db')
+    capture_type_list = []
+    for capture_type in session.query(CaptureType):
+        capture_type_list.append(capture_type.to_json())
+    return json.dumps(capture_type_list)
 
 @app.route("/capturetype", methods=['POST'])
 def add_capture_type():
