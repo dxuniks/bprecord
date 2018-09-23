@@ -112,7 +112,7 @@ def main():
 
     if action == 'loaddata':
         logging.info('NOT SUPORTED: load data in [%s] to db is [%s]' % (input_filename, dbname))
-
+    
     if action == 'getall':
         logging.info('NOT SUPORTED: load data in [%s] to db is [%s]' % (input_filename, dbname))
 
